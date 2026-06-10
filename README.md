@@ -2,7 +2,7 @@
 
 This repository provides a compact C userspace template for working with
 Alveo boards that use XDMA for data movement and HBICAP for static/A1-region
-reconfiguration. The goal is to offer a small, easy-to-adapt software starting
+reconfiguration. It is a companion software template for the hardware available [here](https://github.com/juanea7/nestdfx-au250-hw-shell). The goal is to offer a small, easy-to-adapt software starting
 point that demonstrates the common patterns you will need to control and
 validate your own reconfigurable hardware design.
 
@@ -82,7 +82,7 @@ sudo ./tutorial partial_region.bin
 ## Hardware contract (shell)
 
 This software repository is intended to be used with a fixed, pre-built
-Alveo shell that defines the stable wrapper boundary and address map. Keep
+Alveo shell that defines the stable wrapper boundary and address map ([check the repo](https://github.com/juanea7/nestdfx-au250-hw-shell)). Keep
 these rules in mind when you adapt the software to a new reconfigurable
 design:
 
