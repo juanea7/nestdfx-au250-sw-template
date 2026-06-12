@@ -287,7 +287,7 @@ int main(int argc, char **argv)
     printf("[1] Reconfiguring the A1 region...\n");
     if (alveo_reconfigure(bitstream_path) < 0) {
         printf("ERROR: reconfiguration failed.\n");
-        goto cleanup;
+        goto end;
     }
 
     /* ------------------------------------------------------------------ */
@@ -297,12 +297,12 @@ int main(int argc, char **argv)
     printf("[2] Allocating DMA buffers...\n");
     if (allocate_dma_buffer(&input_buffer, transfer_size) < 0) {
         printf("ERROR: could not allocate input buffer.\n");
-        goto cleanup;
+        goto end;
     }
 
     if (allocate_dma_buffer(&output_buffer, transfer_size) < 0) {
         printf("ERROR: could not allocate output buffer.\n");
-        goto cleanup;
+        goto cleanup_input;
     }
 
     fill_input_pattern(input_buffer, test_words);
@@ -376,7 +376,9 @@ int main(int argc, char **argv)
     status = EXIT_SUCCESS;
 
 cleanup:
-    free(input_buffer);
     free(output_buffer);
+cleanup_input:
+    free(input_buffer);
+end:
     return status;
 }
