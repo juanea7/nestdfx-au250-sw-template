@@ -15,18 +15,18 @@ validate your own reconfigurable hardware design.
   * `alveo_reg_read32()` / `alveo_reg_write32()` — simple AXI-Lite register
     access through the XDMA user BAR.
   * `alveo_write()` / `alveo_read()` — full-AXI XDMA H2C/C2H bulk transfers.
-* Example applications under `examples/`, each targeting a specific
+* Example applications under `accelerators/`, each targeting a specific
   reconfigurable module.
-* Simple application selection using `make APP=<name>`.
+* Simple application selection using `make ACCEL=<name>`.
 
 ## Repository layout
 
 * [alveo.h](alveo.h): configuration macros and public API.
 * [alveo.c](alveo.c): implementation of register, DMA and reconfiguration
   helpers.
-* [examples/](examples/): example programs for specific reconfigurable
+* [accelerators/](accelerators/): example programs for specific reconfigurable
   modules.
-* [Makefile](Makefile): build rules for `libalveo.a` and the selected example.
+* [Makefile](Makefile): build rules for `libalveo.a` and the selected accelerator.
 
 ## Quick start
 
@@ -34,45 +34,34 @@ validate your own reconfigurable hardware design.
    character devices (`/dev/xdma0_*`). Ensure your user has permission to
    access those device nodes (udev rules or root).
 
-2. List the available examples:
+2. List the available accelerator:
 
 ```bash
-make list_examples
+make list_accelerators
 ```
 
-3. Build one example:
+3. Build one accelerators:
 
 ```bash
-make APP=timer_bram
+make ACCEL=timer_bram
 ```
 
-or:
+This produces `libalveo.a` and an executable with the selected accelerator name.
 
-```bash
-make APP=ddr_scaler_hls
-```
-
-This produces `libalveo.a` and an executable with the selected example name.
-
-4. Run the example:
+4. Run the accelerator:
 
 ```bash
 ./timer_bram <a1_region_bitstream.bin>
 ```
 
-or:
-
-```bash
-./ddr_scaler_hls <a1_region_bitstream.bin>
-```
 
 **Notes**
 
 * `<a1_region_bitstream.bin>` must be a raw `.bin` file where size is a
-  multiple of 4 bytes (the loader checks this). The example program
+  multiple of 4 bytes (the loader checks this). The accelerator program
   performs a validation sequence but does not validate the full contents of
   the bitstream beyond a successful HBICAP completion.
-* The selected software example must match the reconfigurable module loaded
+* The selected software accelerator must match the reconfigurable module loaded
   into A1.
 
 ## How the code maps to hardware paths
@@ -84,26 +73,19 @@ or:
   `/dev/xdma0_h2c_0` and `/dev/xdma0_c2h_0`. For these calls pass the Vivado
   full-AXI address directly (no translation).
 
-## Build and run example
+## Build and run accelerator
 
 ```bash
-make APP=timer_bram
+make ACCEL=timer_bram
 sudo ./timer_bram partial_region.bin
-```
-
-For the HLS DDR scaler example:
-
-```bash
-make APP=ddr_scaler_hls
-sudo ./ddr_scaler_hls partial_region.bin
 ```
 
 ## Adapting this template to your design
 
-* Create a new example under [examples](examples), or copy an existing one:
+* Create a new example under [accelerators](accelerators), or copy an existing one:
 
 ```bash
-cp examples/ddr_scaler_hls.c examples/my_accel.c
+cp accelerators/timer_bram.c accelerators/my_accel.c
 ```
 
 * Change the user-design-specific addresses near the top of the file. For
@@ -114,10 +96,10 @@ cp examples/ddr_scaler_hls.c examples/my_accel.c
 #define BRAM_BASE_ADDR   0x80000000ULL
 ```
 
-* Build the new example with:
+* Build the new accelerator with:
 
 ```bash
-make APP=my_accel
+make ACCEL=my_accel
 ```
 
 The recommended convention is to use the same name as in the hardware
@@ -128,7 +110,7 @@ repository:
 make ACCEL=my_accel
 
 # Software repository
-make APP=my_accel
+make ACCEL=my_accel
 ```
 
 ## Hardware contract (shell)
@@ -157,16 +139,16 @@ design:
 ## Example integration workflow
 
 1. User creates or selects a reconfigurable module in the hardware repository.
-2. Run synthesis/implementation to produce a partial bitstream/bin:
+2. Run synthesis/implementation to produce a partial bitstream/bin (in the hw repo):
 
 ```bash
 make ACCEL=<name>
 ```
 
-3. Build the matching software example:
+3. Build the matching software example (in this repo):
 
 ```bash
-make APP=<name>
+make ACCEL=<name>
 ```
 
 4. Run the software example with the generated `.bin`:
@@ -175,7 +157,7 @@ make APP=<name>
 sudo ./<name> <partial.bin>
 ```
 
-Note: the examples use sample addresses for demonstration and may need to be
+Note: the accelerators use sample addresses for demonstration and may need to be
 updated to match addresses chosen inside the user's reconfigurable region. The
 shell's address map is authoritative.
 

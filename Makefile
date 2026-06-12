@@ -5,41 +5,41 @@ CFLAGS ?= -O2 -Wall -Wextra -Wpedantic -std=c11
 CPPFLAGS ?=
 
 # Software example selected by the user.
-# It must match a file in examples/<APP>.c
-APP ?= timer_bram
+# It must match a file in accelerators/<ACCEL>.c
+ACCEL ?= timer_bram
 
-APPS := $(patsubst examples/%.c,%,$(wildcard examples/*.c))
+ACCELS := $(patsubst accelerators/%.c,%,$(wildcard accelerators/*.c))
 
 LIB := libalveo.a
 LIB_OBJ := alveo.o
 
-TARGET := $(APP)
-APP_SRC := examples/$(APP).c
-APP_OBJ := examples/$(APP).o
+TARGET := $(ACCEL)
+ACCEL_SRC := accelerators/$(ACCEL).c
+ACCEL_OBJ := accelerators/$(ACCEL).o
 
-.PHONY: all clean clean_app list_examples check_app
+.PHONY: all clean clean_app list_accelerators check_app
 
 all: check_app $(LIB) $(TARGET)
 
 check_app:
-	@test -f $(APP_SRC) || \
-		(echo "ERROR: unknown software example '$(APP)'"; exit 1)
-	@echo "Selected software example: $(APP)"
+	@test -f $(ACCEL_SRC) || \
+		(echo "ERROR: unknown software accelerator '$(ACCEL)'"; exit 1)
+	@echo "Selected software accelerator: $(ACCEL)"
 
-list_examples:
-	@printf "%s\n" $(APPS) | sort
+list_accelerators:
+	@printf "%s\n" $(ACCELS) | sort
 
 $(LIB): $(LIB_OBJ)
 	$(AR) rcs $@ $^
 
-$(TARGET): $(APP_OBJ) $(LIB)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $(APP_OBJ) -L. -lalveo
+$(TARGET): $(ACCEL_OBJ) $(LIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $(ACCEL_OBJ) -L. -lalveo
 
 %.o: %.c alveo.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean_app:
-	rm -f $(APP_OBJ) $(TARGET)
+	rm -f $(ACCEL_OBJ) $(TARGET)
 
 clean:
-	rm -f $(LIB_OBJ) examples/*.o $(LIB) $(APPS)
+	rm -f $(LIB_OBJ) accelerators/*.o $(LIB) $(ACCELS)
